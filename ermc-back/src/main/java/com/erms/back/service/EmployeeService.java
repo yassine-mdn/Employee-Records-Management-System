@@ -53,6 +53,8 @@ public class EmployeeService {
 
     public void delete(@NotNull String id) {
         log.info("Deleting employee with id: {}", id);
+        if (!employeeRepository.existsById(id))
+            throw new EmployeeNotFoundException(id);
         employeeRepository.deleteById(id);
     }
 

@@ -39,7 +39,8 @@ public class Employee implements UserDetails {
     private String email;
     @JsonIgnore
     private String password;
-    private Role role;
+    @Builder.Default
+    private Role role = Role.NO_ROLE;
 
 
     @JsonIgnore

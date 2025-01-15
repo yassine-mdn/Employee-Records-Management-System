@@ -3,6 +3,7 @@ package com.erms.back.service;
 
 
 import com.erms.back.Exception.EmployeeNotFoundException;
+import com.erms.back.Exception.PageOutOfBoundException;
 import com.erms.back.dto.EmployeeDto;
 import com.erms.back.model.Employee;
 import com.erms.back.model.enums.Role;
@@ -16,8 +17,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
 import org.modelmapper.record.RecordModule;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -111,6 +117,48 @@ class EmployeeServiceTest {
         assertThrows(EmployeeNotFoundException.class, () -> employeeService.update("fake_id", employeeDto));
         verify(employeeRepository, times(1)).findById("fake_id");
     }
+
+    @Test
+    void getPage_shouldReturnPageEmptyPage_WhenNoEmployeeInDb(){
+        when(employeeRepository.findAll(PageRequest.of(0,1))).thenReturn(
+                Page.empty()
+        );
+
+        Page<Employee> result = employeeService.getPage(PageRequest.of(0,1));
+        assertNotNull(result);
+        assertEquals(0, result.getTotalElements());
+
+    }
+
+    @Test
+    void getPage_shouldReturnPageWithEmployee_WhenEmployeeInDb(){
+        Page<Employee> employeePage = new PageImpl<>(Collections.singletonList(employee),
+                PageRequest.of(0, 1),
+                1);
+
+        when(employeeRepository.findAll(PageRequest.of(0, 1))).thenReturn(employeePage);
+
+        Page<Employee> result = employeeService.getPage(PageRequest.of(0, 1));
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals("jordan teller carter", result.getContent().get(0).getFullName());
+    }
+
+    @Test
+    void getPage_shouldThrowException_WhenPageOutOfBounds() {
+
+        Pageable pageable = PageRequest.of(2, 1);
+
+        when(employeeRepository.findAll(pageable)).thenReturn(
+                new PageImpl<>(Collections.emptyList(), pageable, 1)
+        );
+
+        assertThrows(PageOutOfBoundException.class, () -> employeeService.getPage(pageable));
+        verify(employeeRepository, times(1)).findAll(pageable);
+    }
+
+
 
     @Test
     void save_ShouldAddEmployee_WhenValidDtoProvided() {

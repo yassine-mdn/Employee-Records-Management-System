@@ -2,6 +2,7 @@ package com.erms.back.service;
 
 
 import com.erms.back.Exception.EmployeeNotFoundException;
+import com.erms.back.Exception.PageOutOfBoundException;
 import com.erms.back.dto.EmployeeDto;
 import com.erms.back.model.Employee;
 import com.erms.back.repository.EmployeeRepository;
@@ -28,7 +29,11 @@ public class EmployeeService {
 
     public Page<Employee> getPage(@NotNull Pageable pageable) {
         log.info("Attempting to get employee page of size {} and offset {}", pageable.getPageSize(), pageable.getOffset());
-        return employeeRepository.findAll(pageable);
+        Page<Employee> result = employeeRepository.findAll(pageable);
+
+        if (pageable.getPageNumber() >= result.getTotalPages())
+                throw new PageOutOfBoundException("Page number is greater than the total number of pages");
+        return result;
     }
 
     public Employee save(@NotNull EmployeeDto employeeDto) {

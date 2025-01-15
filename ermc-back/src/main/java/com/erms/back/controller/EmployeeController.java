@@ -1,7 +1,6 @@
 package com.erms.back.controller;
 
 
-import com.erms.back.Exception.PageOutOfBoundException;
 import com.erms.back.dto.EmployeeDto;
 import com.erms.back.model.Employee;
 import com.erms.back.service.EmployeeService;
@@ -25,10 +24,7 @@ public class EmployeeController {
             @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(name = "size", required = false, defaultValue = "15") Integer size
     ) {
-        if (page < 0 || size < 0)
-            throw new PageOutOfBoundException();
-        else
-            return ResponseEntity.ok(new PageWrapper<>(employeeService.getPage(PageRequest.of(page, size))));
+        return ResponseEntity.ok(new PageWrapper<>(employeeService.getPage(PageRequest.of(page, size))));
     }
 
     @GetMapping("/{id}")

@@ -23,7 +23,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,6 +52,11 @@ class EmployeeServiceTest {
     @BeforeEach
     void setUp() {
 
+        LocalDate localDate = LocalDate.of(1995, 9, 13);
+
+        // Convert LocalDate to Date
+        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
         employeeId = "UUID";
         role = Role.NO_ROLE;
         employee = Employee.builder()
@@ -59,7 +66,7 @@ class EmployeeServiceTest {
                 .department("Department")
                 .employmentStatus("EmploymentStatus")
                 .contactInformation("ContactInformation")
-                .hireDate(LocalDate.of(1995,9,13))
+                .hireDate(date)
                 .fullName("jordan teller carter")
                 .password("password")
                 .role(role)
@@ -69,10 +76,11 @@ class EmployeeServiceTest {
                 "John Doe",
                 "Software Engineer",
                 "Technology",
-                LocalDate.of(2023, 1, 15),
+                date,
                 "Full-Time",
-                "john.doe@example.com",
+                "06666666666",
                 "123 Elm Street, Springfield, USA",
+                "email@email.com",
                 role
         );
     }
@@ -170,7 +178,7 @@ class EmployeeServiceTest {
                         .department("Department")
                         .employmentStatus("EmploymentStatus")
                         .contactInformation("ContactInformation")
-                        .hireDate(LocalDate.of(1995,9,13))
+                        .hireDate(new Date())
                         .fullName("jordan teller carter")
                         .password("password")
                         .role(role)

@@ -25,6 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -60,10 +61,12 @@ public class EmployeeController {
             @RequestParam(name = "size", required = false, defaultValue = "15") Integer size,
             @Parameter(
                     in = ParameterIn.QUERY,
-                    name = "filter", description = "Filter query",
-                    schema = @Schema(type = "string"), required = false,
+                    name = "filter",
+                    description = "Filter query for more detail on syntax visit : https://github.com/turkraft/springfilter?tab=readme-ov-file",
+                    schema = @Schema(type = "string"),
+                    required = false,
                     example = "department in ['HR','IT'] and employmentStatus : 'ACTIVE'"
-            ) @Filter Specification<Employee> specification
+            ) @Nullable @Filter Specification<Employee> specification
     ) {
         if (specification != null)
             return ResponseEntity.ok(new PageWrapper<>(employeeService.getPage(PageRequest.of(page, size), specification)));

@@ -50,14 +50,10 @@ class EmployeeServiceTest {
     private EmployeeDto employeeDto;
     private String employeeId;
     private Role role;
+    LocalDate localDate = LocalDate.of(1995, 9, 13);
 
     @BeforeEach
     void setUp() {
-
-        LocalDate localDate = LocalDate.of(1995, 9, 13);
-
-        // Convert LocalDate to Date
-        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         employeeId = "UUID";
         role = Role.NO_ROLE;
@@ -68,7 +64,7 @@ class EmployeeServiceTest {
                 .department(Department.IT)
                 .employmentStatus(EmploymentStatus.ACTIVE)
                 .contactInformation("ContactInformation")
-                .hireDate(date)
+                .hireDate(localDate)
                 .fullName("jordan teller carter")
                 .password("password")
                 .role(role)
@@ -78,7 +74,7 @@ class EmployeeServiceTest {
                 "John Doe",
                 "Software Engineer",
                 Department.IT,
-                date,
+                localDate,
                 EmploymentStatus.ACTIVE,
                 "06666666666",
                 "123 Elm Street, Springfield, USA",
@@ -180,7 +176,7 @@ class EmployeeServiceTest {
                         .department(Department.IT)
                         .employmentStatus(EmploymentStatus.ACTIVE)
                         .contactInformation("ContactInformation")
-                        .hireDate(new Date())
+                        .hireDate(localDate)
                         .fullName("jordan teller carter")
                         .password("password")
                         .role(role)

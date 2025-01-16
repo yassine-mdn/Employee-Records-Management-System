@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -41,12 +42,10 @@ public class Employee implements UserDetails {
 
     private Date hireDate;
 
-    @NotBlank
-    @Enumerated(EnumType.STRING)
+    @NotNull
     private Department department;
 
-    @NotBlank
-    @Enumerated(EnumType.STRING)
+   @NotNull
     private EmploymentStatus employmentStatus;
 
     @NotBlank
@@ -64,6 +63,7 @@ public class Employee implements UserDetails {
     private String password;
 
     @Builder.Default
+
     private Role role = Role.NO_ROLE;
 
 

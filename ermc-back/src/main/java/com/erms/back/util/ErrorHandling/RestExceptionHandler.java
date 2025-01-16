@@ -2,6 +2,7 @@ package com.erms.back.util.ErrorHandling;
 
 import com.erms.back.Exception.BaseAppException;
 import com.erms.back.Exception.EmployeeNotFoundException;
+import com.erms.back.Exception.NonAuthorizedException;
 import com.erms.back.Exception.PageOutOfBoundException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -57,7 +58,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             String objectName = error.getObjectName();
             Object rejectedValue = ((FieldError) error).getRejectedValue();
             String errorMessage = error.getDefaultMessage();
-           subErrors.add(new ApiValidationError(objectName, fieldName, rejectedValue, errorMessage));
+            subErrors.add(new ApiValidationError(objectName, fieldName, rejectedValue, errorMessage));
         });
         apiError.setSubErrors(subErrors);
         return buildResponseEntity(apiError);
@@ -89,8 +90,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(PageOutOfBoundException.class)
     protected ResponseEntity<Object> handlePageOutOfBoundException(
             PageOutOfBoundException ex
-    ){
+    ) {
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(ex.getMessage());
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(NonAuthorizedException.class)
+    protected ResponseEntity<Object> handleNonAuthorizedException(NonAuthorizedException ex) {
+        ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED);
         apiError.setMessage(ex.getMessage());
         return buildResponseEntity(apiError);
     }

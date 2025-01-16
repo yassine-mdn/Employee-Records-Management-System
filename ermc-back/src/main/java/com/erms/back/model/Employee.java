@@ -1,5 +1,7 @@
 package com.erms.back.model;
 
+import com.erms.back.model.enums.Department;
+import com.erms.back.model.enums.EmploymentStatus;
 import com.erms.back.model.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -33,14 +35,23 @@ public class Employee implements UserDetails {
 
     @NotBlank
     private String fullName;
+
     @NotBlank
     private String jobTitle;
-    private String department;
+
     private Date hireDate;
+
     @NotBlank
-    private String employmentStatus;
+    @Enumerated(EnumType.STRING)
+    private Department department;
+
+    @NotBlank
+    @Enumerated(EnumType.STRING)
+    private EmploymentStatus employmentStatus;
+
     @NotBlank
     private String contactInformation;
+
     @NotBlank
     private String address;
 
@@ -48,8 +59,10 @@ public class Employee implements UserDetails {
     @Email
     @NotBlank(message = "Email is mandatory")
     private String email;
+
     @JsonIgnore
     private String password;
+
     @Builder.Default
     private Role role = Role.NO_ROLE;
 

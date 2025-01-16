@@ -6,6 +6,8 @@ import com.erms.back.Exception.EmployeeNotFoundException;
 import com.erms.back.Exception.PageOutOfBoundException;
 import com.erms.back.dto.EmployeeDto;
 import com.erms.back.model.Employee;
+import com.erms.back.model.enums.Department;
+import com.erms.back.model.enums.EmploymentStatus;
 import com.erms.back.model.enums.Role;
 import com.erms.back.repository.EmployeeRepository;
 import org.junit.jupiter.api.*;
@@ -63,8 +65,8 @@ class EmployeeServiceTest {
                 .id(employeeId)
                 .address("Address")
                 .email("email")
-                .department("Department")
-                .employmentStatus("EmploymentStatus")
+                .department(Department.IT)
+                .employmentStatus(EmploymentStatus.ACTIVE)
                 .contactInformation("ContactInformation")
                 .hireDate(date)
                 .fullName("jordan teller carter")
@@ -75,9 +77,9 @@ class EmployeeServiceTest {
         employeeDto = new EmployeeDto(
                 "John Doe",
                 "Software Engineer",
-                "Technology",
+                Department.IT,
                 date,
-                "Full-Time",
+                EmploymentStatus.ACTIVE,
                 "06666666666",
                 "123 Elm Street, Springfield, USA",
                 "email@email.com",
@@ -175,8 +177,8 @@ class EmployeeServiceTest {
                         .id(employeeId)
                         .address("Address")
                         .email("email")
-                        .department("Department")
-                        .employmentStatus("EmploymentStatus")
+                        .department(Department.IT)
+                        .employmentStatus(EmploymentStatus.ACTIVE)
                         .contactInformation("ContactInformation")
                         .hireDate(new Date())
                         .fullName("jordan teller carter")
@@ -196,11 +198,12 @@ class EmployeeServiceTest {
 
     @Test
     void delete_ShouldDeleteEmployee_WhenEmployeeExists() {
-        doNothing().when(employeeRepository).deleteById("id");
+        doNothing().when(employeeRepository).deleteById(employeeId);
+        when(employeeRepository.existsById(employeeId)).thenReturn(true);
 
-        employeeService.delete("id");
+        employeeService.delete(employeeId);
 
-        verify(employeeRepository, times(1)).deleteById("id");
+        verify(employeeRepository, times(1)).deleteById(employeeId);
     }
 
 }

@@ -1,5 +1,7 @@
 package com.erms.back.dto;
 
+import com.erms.back.model.enums.Department;
+import com.erms.back.model.enums.EmploymentStatus;
 import com.erms.back.model.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -13,11 +15,11 @@ public record EmployeeDto(
         @NotBlank
         String jobTitle,
         @NotBlank
-        String department,
+        Department department,
         @NotNull
         Date hireDate,
         @NotBlank
-        String employmentStatus,
+        EmploymentStatus employmentStatus,
         @NotBlank
         String contactInformation,
         @NotBlank

@@ -5,11 +5,13 @@ import com.erms.back.Exception.EmployeeNotFoundException;
 import com.erms.back.Exception.NonAuthorizedException;
 import com.erms.back.auth.AuthenticationRequest;
 import com.erms.back.auth.AuthenticationResponse;
+import com.erms.back.model.Employee;
 import com.erms.back.model.enums.Role;
 import com.erms.back.repository.EmployeeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +26,7 @@ import java.io.IOException;
 public class AuthenticationService {
 
 
-    private final EmployeeRepository repository;
+    private final EmployeeRepository employeeRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
@@ -37,7 +39,7 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
-        var user = repository.findByEmail(request.getEmail())
+        var user = employeeRepository.findByEmail(request.getEmail())
                 .orElseThrow(EmployeeNotFoundException::new);
         if (user.getRole().equals(Role.NO_ROLE))
             throw new NonAuthorizedException();
@@ -51,6 +53,14 @@ public class AuthenticationService {
                 .build();
     }
 
+    public Employee register(@NotNull String id, @NotNull String password) {
+        Employee employee = employeeRepository.findById(id).map(oldEmployeeData -> {
+            oldEmployeeData.setPassword(password);
+            return oldEmployeeData;
+        }).orElseThrow(EmployeeNotFoundException::new);
+        return employeeRepository.save(employee);
+    }
+
 
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -62,7 +72,7 @@ public class AuthenticationService {
         refreshToken = authHeader.substring(7);
         userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
-            UserDetails userDetails = this.repository.findByEmail(userEmail).orElseThrow();
+            UserDetails userDetails = this.employeeRepository.findByEmail(userEmail).orElseThrow();
             if (jwtService.isTokenValid(refreshToken , userDetails)) {
                 var jwtToken = jwtService.generateToken(userDetails);
                 // revoke old refresh token

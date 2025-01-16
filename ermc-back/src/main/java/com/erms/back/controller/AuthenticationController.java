@@ -3,6 +3,8 @@ package com.erms.back.controller;
 
 import com.erms.back.auth.AuthenticationRequest;
 import com.erms.back.auth.AuthenticationResponse;
+import com.erms.back.auth.RegisterRequest;
+import com.erms.back.model.Employee;
 import com.erms.back.repository.EmployeeRepository;
 import com.erms.back.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,19 +23,24 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-    private final AuthenticationService service;
-    private final EmployeeRepository repository;
+    private final AuthenticationService authenticationService;
+    private final EmployeeRepository employeeRepository;
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(
             @RequestBody AuthenticationRequest request
     ) {
-        return ResponseEntity.ok(service.authenticate(request));
+        return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
     @PostMapping("/refresh-token")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        service.refreshToken(request, response);
+        authenticationService.refreshToken(request, response);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Employee> register(@RequestBody RegisterRequest request){
+        return ResponseEntity.ok(authenticationService.register(request.getUserId(), request.getPassword()));
     }
 
 }

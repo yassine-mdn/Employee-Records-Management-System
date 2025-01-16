@@ -106,4 +106,7 @@ public class Employee implements UserDetails {
         return true;
     }
 
+    public boolean hasRole(Role role) {
+        return this.role.equals(role);
+    }
 }

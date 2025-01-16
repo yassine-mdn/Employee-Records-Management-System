@@ -1,13 +1,17 @@
 package com.erms.back.controller;
 
 
+import com.erms.back.Exception.NonAuthorizedException;
 import com.erms.back.dto.EmployeeDto;
 import com.erms.back.model.Employee;
+import com.erms.back.model.enums.Role;
+import com.erms.back.service.AuthenticatedDetailsService;
 import com.erms.back.service.EmployeeService;
 import com.erms.back.util.ErrorHandling.ApiError;
+import com.erms.back.util.HasAuthorization;
+import com.erms.back.util.OpenApi.UserRoleDescription;
 import com.erms.back.util.PageWrapper;
 import com.turkraft.springfilter.boot.Filter;
-import com.turkraft.springfilter.converter.FilterSpecification;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -16,26 +20,29 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
-
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/employees")
+@Tag(name = "Employee Controller", description = "Handles all operations related to managing employees")
 public class EmployeeController {
 
     private static final Logger log = LoggerFactory.getLogger(EmployeeController.class);
     private final EmployeeService employeeService;
+    private final HasAuthorization authorization;
 
     @Operation(summary = "Return a page of Employees")
     @ApiResponses(value = {
@@ -55,7 +62,9 @@ public class EmployeeController {
             )
 
     })
+    @UserRoleDescription
     @GetMapping()
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','HR')")
     public ResponseEntity<PageWrapper<Employee>> getPage(
             @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(name = "size", required = false, defaultValue = "15") Integer size,
@@ -91,7 +100,9 @@ public class EmployeeController {
                     }
             )
     })
+    @UserRoleDescription
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','HR')")
     public ResponseEntity<Employee> getById(@PathVariable(name = "id") String id) {
         return ResponseEntity.ok(employeeService.getById(id));
     }
@@ -134,9 +145,11 @@ public class EmployeeController {
                     }
             )
     })
+    @UserRoleDescription
     @PostMapping()
+    @PreAuthorize("hasAnyRole('ADMIN','HR')")
     public ResponseEntity<Employee> save(@Valid @RequestBody EmployeeDto body) {
-        //TODO : check if admin to set Role else Role is NO_ROLE or throw exception not sure for now
+        authorization.canEditRole(body);
         return new ResponseEntity<>(employeeService.save(body), HttpStatus.CREATED);
     }
 
@@ -178,8 +191,12 @@ public class EmployeeController {
                     }
             )
     })
+    @UserRoleDescription
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','HR')")
     public ResponseEntity<Employee> update(@PathVariable(name = "id") String id, @RequestBody EmployeeDto body) {
+        authorization.canEdit(body);
+        authorization.canEditRole(body);
         return new ResponseEntity<>(employeeService.update(id, body), HttpStatus.OK);
     }
 
@@ -200,10 +217,17 @@ public class EmployeeController {
                     }
             )
     })
+    @UserRoleDescription
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','HR')")
     public ResponseEntity<Employee> delete(@PathVariable(name = "id") String id) {
+
+        authorization.canDelete(employeeService.getById(id));
         employeeService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+
+
 
 }

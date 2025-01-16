@@ -19,3 +19,10 @@ logging:
   file:
     name: logs/app.logs
     path: logs
+application:
+  security:
+    jwt:
+      secret-key: 556A586E3272357538782F413F4428472B4B6250655368566B59703373367639
+      expiration: 86400000
+      refresh-token:
+        expiration: 2592000000

@@ -9,6 +9,7 @@ import com.erms.back.service.AuthenticatedDetailsService;
 import com.erms.back.service.EmployeeService;
 import com.erms.back.util.ErrorHandling.ApiError;
 import com.erms.back.util.HasAuthorization;
+import com.erms.back.util.OpenApi.UserRoleDescription;
 import com.erms.back.util.PageWrapper;
 import com.turkraft.springfilter.boot.Filter;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,6 +62,7 @@ public class EmployeeController {
             )
 
     })
+    @UserRoleDescription
     @GetMapping()
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','HR')")
     public ResponseEntity<PageWrapper<Employee>> getPage(
@@ -98,6 +100,7 @@ public class EmployeeController {
                     }
             )
     })
+    @UserRoleDescription
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','HR')")
     public ResponseEntity<Employee> getById(@PathVariable(name = "id") String id) {
@@ -142,6 +145,7 @@ public class EmployeeController {
                     }
             )
     })
+    @UserRoleDescription
     @PostMapping()
     @PreAuthorize("hasAnyRole('ADMIN','HR')")
     public ResponseEntity<Employee> save(@Valid @RequestBody EmployeeDto body) {
@@ -187,6 +191,7 @@ public class EmployeeController {
                     }
             )
     })
+    @UserRoleDescription
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','HR')")
     public ResponseEntity<Employee> update(@PathVariable(name = "id") String id, @RequestBody EmployeeDto body) {
@@ -212,6 +217,7 @@ public class EmployeeController {
                     }
             )
     })
+    @UserRoleDescription
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','HR')")
     public ResponseEntity<Employee> delete(@PathVariable(name = "id") String id) {

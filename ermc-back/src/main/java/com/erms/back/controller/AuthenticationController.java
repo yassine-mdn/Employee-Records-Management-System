@@ -8,6 +8,7 @@ import com.erms.back.model.Employee;
 import com.erms.back.repository.EmployeeRepository;
 import com.erms.back.service.AuthenticationService;
 import com.erms.back.util.ErrorHandling.ApiError;
+import com.erms.back.util.OpenApi.UserRoleDescription;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -72,6 +73,7 @@ public class AuthenticationController {
                     }
             )
     })
+    @UserRoleDescription
     @PostMapping("/register")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Employee> register(@RequestBody RegisterRequest request){

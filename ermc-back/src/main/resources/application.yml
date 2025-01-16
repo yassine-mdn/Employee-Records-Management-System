@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: ermc-back
+# This is only temporary -> will migrate to Oracle SQL later on
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+logging:
+  file:
+    name: logs/app.logs
+    path: logs

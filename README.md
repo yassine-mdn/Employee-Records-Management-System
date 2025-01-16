@@ -19,12 +19,12 @@ The Employee Records Management System (ERMS) is designed to centralize the mana
 ## Tasks to be Done
 
  **Backend Development**
-  - [ ] Implement RESTful API using Spring Boot.
-  - [ ] Create Swagger documentation for the API.
-  - [ ] Employee CRUD Operations
+  - [X] Implement RESTful API using Spring Boot.
+  - [X] Create Swagger documentation for the API.
+  - [X] Employee CRUD Operations
   - [ ] Set up user authentication and authorization (JWT or session-based).
   - [ ] Role Based Access Controll
-  - [ ] Implement logging and audit trail functionality.
+  - [X] Implement logging and audit trail functionality.
   - [ ] Implement basic reporting features for employee data.
 
 **Frontend Development**
@@ -33,7 +33,7 @@ The Employee Records Management System (ERMS) is designed to centralize the mana
   - [ ] Create forms for employee CRUD operations.
 
  **Testing**
-  - [ ] Write unit tests for service and controller layers using JUnit and Mockito.
+  - [X] Write unit tests for service and controller layers using JUnit and Mockito.
   - [ ] Validate API endpoints with Postman and create a Postman collection.
 
   

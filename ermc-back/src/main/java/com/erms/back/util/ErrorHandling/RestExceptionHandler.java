@@ -31,7 +31,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleAllException(Exception ex, WebRequest request) {
         ApiError apiError = new ApiError(NOT_FOUND);
         apiError.setMessage(ex.getMessage());
-        apiError.setDebugMessage(ex.getClass().getSimpleName());
+        apiError.setDebugMessage(ex.getCause().getMessage());
         return buildResponseEntity(apiError);
     }
 

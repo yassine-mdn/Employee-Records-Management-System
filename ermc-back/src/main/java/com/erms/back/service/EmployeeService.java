@@ -31,7 +31,7 @@ public class EmployeeService {
         log.info("Attempting to get employee page of size {} and offset {}", pageable.getPageSize(), pageable.getOffset());
         Page<Employee> result = employeeRepository.findAll(pageable);
 
-        if (pageable.getPageNumber() >= result.getTotalPages())
+        if (pageable.getPageNumber() > result.getTotalPages())
                 throw new PageOutOfBoundException("Page number is greater than the total number of pages");
         return result;
     }

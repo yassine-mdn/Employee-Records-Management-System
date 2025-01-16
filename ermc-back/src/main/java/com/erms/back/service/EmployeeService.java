@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -34,6 +35,10 @@ public class EmployeeService {
         if (pageable.getPageNumber() > result.getTotalPages())
                 throw new PageOutOfBoundException("Page number is greater than the total number of pages");
         return result;
+    }
+
+    public Page<Employee> getPage(@NotNull Pageable pageable, @NotNull Specification<Employee> specification) {
+        return employeeRepository.findAll(specification,pageable);
     }
 
     public Employee save(@NotNull EmployeeDto employeeDto) {

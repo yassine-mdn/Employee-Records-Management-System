@@ -6,7 +6,11 @@ import com.erms.back.model.Employee;
 import com.erms.back.service.EmployeeService;
 import com.erms.back.util.ErrorHandling.ApiError;
 import com.erms.back.util.PageWrapper;
+import com.turkraft.springfilter.boot.Filter;
+import com.turkraft.springfilter.converter.FilterSpecification;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,7 +18,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
+
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/employees")
 public class EmployeeController {
 
+    private static final Logger log = LoggerFactory.getLogger(EmployeeController.class);
     private final EmployeeService employeeService;
 
     @Operation(summary = "Return a page of Employees")
@@ -48,8 +57,16 @@ public class EmployeeController {
     @GetMapping()
     public ResponseEntity<PageWrapper<Employee>> getPage(
             @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(name = "size", required = false, defaultValue = "15") Integer size
+            @RequestParam(name = "size", required = false, defaultValue = "15") Integer size,
+            @Parameter(
+                    in = ParameterIn.QUERY,
+                    name = "filter", description = "Filter query",
+                    schema = @Schema(type = "string"), required = false,
+                    example = "department in ['HR','IT'] and employmentStatus : 'ACTIVE'"
+            ) @Filter Specification<Employee> specification
     ) {
+        if (specification != null)
+            return ResponseEntity.ok(new PageWrapper<>(employeeService.getPage(PageRequest.of(page, size), specification)));
         return ResponseEntity.ok(new PageWrapper<>(employeeService.getPage(PageRequest.of(page, size))));
     }
 

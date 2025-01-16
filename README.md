@@ -22,6 +22,7 @@ The Employee Records Management System (ERMS) is designed to centralize the mana
   - [X] Implement RESTful API using Spring Boot.
   - [X] Create Swagger documentation for the API.
   - [X] Employee CRUD Operations
+  - [X] Search and Filtering for Employee
   - [ ] Set up user authentication and authorization (JWT or session-based).
   - [ ] Role Based Access Controll
   - [X] Implement logging and audit trail functionality.

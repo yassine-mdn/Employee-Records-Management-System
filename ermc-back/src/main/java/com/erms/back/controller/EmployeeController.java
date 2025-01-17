@@ -220,7 +220,6 @@ public class EmployeeController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','HR')")
     public ResponseEntity<Employee> update(@PathVariable(name = "id") String id, @RequestBody EmployeeDto body) {
-        authorization.canEdit(body);
         authorization.canEditRole(body);
         return new ResponseEntity<>(employeeService.update(id, body), HttpStatus.OK);
     }

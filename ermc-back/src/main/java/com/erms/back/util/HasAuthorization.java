@@ -16,22 +16,26 @@ public class HasAuthorization {
 
     public void canEdit(EmployeeDto body) {
         Employee authenticatedEmployee = authenticatedDetailsService.getAuthenticatedEmployee();
-        if (authenticatedEmployee.getRole() == Role.ADMIN && authenticatedEmployee.getDepartment() != body.department()) {
-            throw new NonAuthorizedException();
+        if (authenticatedEmployee.getRole() == Role.MANAGER && !authenticatedEmployee.getDepartment().equals(body.department())) {
+            throw new NonAuthorizedException("Managers can only act on people within their own department");
         }
     }
 
     public void canEditRole(EmployeeDto body) {
         Employee authenticatedEmployee = authenticatedDetailsService.getAuthenticatedEmployee();
-        if (!authenticatedEmployee.hasRole(Role.ADMIN) && body.role() != null && body.role() != Role.NO_ROLE) {
-            throw new NonAuthorizedException();
+        if (authenticatedEmployee.hasRole(Role.ADMIN)) {
+            return;
+        }
+
+        if (body.role() != null && body.role() != Role.NO_ROLE) {
+            throw new NonAuthorizedException("Only Admin can edit roles");
         }
     }
 
     public void canDelete(Employee employee) {
         Employee authenticatedEmployee = authenticatedDetailsService.getAuthenticatedEmployee();
         if (!authenticatedEmployee.hasRole(Role.ADMIN) && employee.getRole() != Role.NO_ROLE) {
-            throw new NonAuthorizedException();
+            throw new NonAuthorizedException("Can't delete Employee with higher authorities");
         }
     }
 

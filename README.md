@@ -35,7 +35,7 @@ The Employee Records Management System (ERMS) is designed to centralize the mana
 
  **Testing**
   - [X] Write unit tests for service and controller layers using JUnit and Mockito.
-  - [ ] Validate API endpoints with Postman and create a Postman collection.
+  - [X] Validate API endpoints with Postman and create a Postman collection.
 
   
 

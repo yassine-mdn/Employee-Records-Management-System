@@ -34,4 +34,13 @@ public class HasAuthorization {
             throw new NonAuthorizedException();
         }
     }
+
+    public boolean isManager() {
+        Employee authenticatedEmployee = authenticatedDetailsService.getAuthenticatedEmployee();
+        return authenticatedEmployee.hasRole(Role.MANAGER);
+    }
+
+    public Employee getEmployee() {
+        return authenticatedDetailsService.getAuthenticatedEmployee();
+    }
 }

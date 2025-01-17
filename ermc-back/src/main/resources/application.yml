@@ -27,6 +27,6 @@ application:
       refresh-token:
         expiration: 2592000000
 pdf:
-  directory: reports
+  directory: reports/
   file-name: employee-report
   company-logo: src/main/resources/static/logo.jpeg

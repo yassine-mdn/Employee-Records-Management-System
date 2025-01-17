@@ -26,7 +26,7 @@ The Employee Records Management System (ERMS) is designed to centralize the mana
   - [X] Set up user authentication and authorization (JWT or session-based).
   - [X] Role Based Access Controll
   - [X] Implement logging and audit trail functionality.
-  - [ ] Implement basic reporting features for employee data.
+  - [X] Implement basic reporting features for employee data.
 
 **Frontend Development**
   - [ ] Design and implement the Swing-based desktop UI.

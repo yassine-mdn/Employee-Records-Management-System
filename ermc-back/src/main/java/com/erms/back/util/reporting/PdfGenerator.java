@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -43,25 +44,6 @@ public class PdfGenerator {
     private String companyLogoPath;
 
 
-    PdfFont font;
-
-    {
-        try {
-            font = PdfFontFactory.createFont(StandardFonts.COURIER);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    PdfFont bold;
-
-    {
-        try {
-            bold = PdfFontFactory.createFont(StandardFonts.COURIER_BOLD);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     private final EmployeeService employeeService;
 
@@ -76,6 +58,20 @@ public class PdfGenerator {
         document.close();
     }
 
+    public ByteArrayOutputStream generatePdfOutputStream() throws PdfException, IOException {
+
+        String destination = getPdfNameWithDate();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PdfDocument pdf = new PdfDocument(new PdfWriter(outputStream));
+        Document document = new Document(pdf);
+        addLogo(document);
+        addDocTitle(document);
+        addTable(document,pdf);
+        document.close();
+        document.close();
+        return outputStream;
+    }
+
     private void addLogo(Document document) {
         try {
             Image img = new Image(ImageDataFactory.create(companyLogoPath));
@@ -86,7 +82,9 @@ public class PdfGenerator {
         }
     }
 
-    private void addDocTitle(Document document) throws PdfException {
+    private void addDocTitle(Document document) throws PdfException, IOException {
+        PdfFont font = PdfFontFactory.createFont(StandardFonts.COURIER);
+        PdfFont bold = PdfFontFactory.createFont(StandardFonts.COURIER_BOLD);
         String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm:ss"));
         Paragraph p1 = new Paragraph();
         p1.add(new Paragraph(fileName).setFont(bold));
@@ -97,8 +95,8 @@ public class PdfGenerator {
 
     }
 
-    private void addTable(Document document, PdfDocument pdfDocument) {
-
+    private void addTable(Document document, PdfDocument pdfDocument) throws IOException {
+        PdfFont bold = PdfFontFactory.createFont(StandardFonts.COURIER_BOLD);
         List<Employee> recentEmployees = employeeService.getLastMonthsEmployees();
 
         Style headerStyle = new Style()

@@ -11,6 +11,7 @@ import com.erms.back.util.ErrorHandling.ApiError;
 import com.erms.back.util.HasAuthorization;
 import com.erms.back.util.OpenApi.UserRoleDescription;
 import com.erms.back.util.PageWrapper;
+import com.erms.back.util.reporting.PdfGenerator;
 import com.turkraft.springfilter.boot.Filter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,11 +28,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 @RestController
@@ -40,9 +48,9 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Employee Controller", description = "Handles all operations related to managing employees")
 public class EmployeeController {
 
-    private static final Logger log = LoggerFactory.getLogger(EmployeeController.class);
     private final EmployeeService employeeService;
     private final HasAuthorization authorization;
+    private final PdfGenerator pdfGenerator;
 
     @Operation(summary = "Return a page of Employees")
     @ApiResponses(value = {
@@ -105,6 +113,24 @@ public class EmployeeController {
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','HR')")
     public ResponseEntity<Employee> getById(@PathVariable(name = "id") String id) {
         return ResponseEntity.ok(employeeService.getById(id));
+    }
+
+
+    @Operation(summary = "return a pdf report of all the employees that joined in the past month")
+    @UserRoleDescription
+    @GetMapping("/report")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<byte[]> test() throws IOException {
+
+        String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
+        String filename = "report-"+localDateString+".pdf";
+
+        ByteArrayOutputStream pdfStream = pdfGenerator.generatePdfOutputStream();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+filename);
+        headers.setContentLength(pdfStream.size());
+        return new ResponseEntity<>(pdfStream.toByteArray(), headers, HttpStatus.OK);
     }
 
     @Operation(summary = "Save new employee to db")

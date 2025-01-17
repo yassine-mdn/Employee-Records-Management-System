@@ -1,18 +1,14 @@
 package com.erms.back.controller;
 
 
-import com.erms.back.Exception.NonAuthorizedException;
 import com.erms.back.dto.EmployeeDto;
 import com.erms.back.model.Employee;
-import com.erms.back.model.enums.Role;
-import com.erms.back.service.AuthenticatedDetailsService;
 import com.erms.back.service.EmployeeService;
 import com.erms.back.util.ErrorHandling.ApiError;
 import com.erms.back.util.HasAuthorization;
 import com.erms.back.util.OpenApi.UserRoleDescription;
 import com.erms.back.util.PageWrapper;
 import com.erms.back.util.reporting.PdfGenerator;
-import com.turkraft.springfilter.boot.Filter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -24,15 +20,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,17 +68,24 @@ public class EmployeeController {
     public ResponseEntity<PageWrapper<Employee>> getPage(
             @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(name = "size", required = false, defaultValue = "15") Integer size,
+
             @Parameter(
                     in = ParameterIn.QUERY,
                     name = "filter",
                     description = "Filter query for more detail on syntax visit : https://github.com/turkraft/springfilter?tab=readme-ov-file",
                     schema = @Schema(type = "string"),
-                    required = false,
                     example = "department in ['HR','IT'] and employmentStatus : 'ACTIVE'"
-            ) @Nullable @Filter Specification<Employee> specification
+            ) @RequestParam(required = false) String filter
     ) {
-        if (specification != null)
-            return ResponseEntity.ok(new PageWrapper<>(employeeService.getPage(PageRequest.of(page, size), specification)));
+        if (authorization.isManager())
+            return ResponseEntity.ok(new PageWrapper<>(employeeService.gePageFromDepartment(
+                    authorization.getEmployee().getDepartment(),
+                    PageRequest.of(page, size),
+                    filter
+            )));
+        if (filter != null) {
+            return ResponseEntity.ok(new PageWrapper<>(employeeService.getPage(PageRequest.of(page, size), filter)));
+        }
         return ResponseEntity.ok(new PageWrapper<>(employeeService.getPage(PageRequest.of(page, size))));
     }
 

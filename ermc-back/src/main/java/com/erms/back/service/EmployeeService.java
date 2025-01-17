@@ -15,6 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -33,12 +36,17 @@ public class EmployeeService {
         Page<Employee> result = employeeRepository.findAll(pageable);
 
         if (pageable.getPageNumber() > result.getTotalPages())
-                throw new PageOutOfBoundException("Page number is greater than the total number of pages");
+            throw new PageOutOfBoundException("Page number is greater than the total number of pages");
         return result;
     }
 
     public Page<Employee> getPage(@NotNull Pageable pageable, @NotNull Specification<Employee> specification) {
-        return employeeRepository.findAll(specification,pageable);
+        return employeeRepository.findAll(specification, pageable);
+    }
+
+    public List<Employee> getLastMonthsEmployees() {
+        LocalDate lastMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1);
+        return employeeRepository.findAllByHireDateAfter(lastMonth);
     }
 
     public Employee save(@NotNull EmployeeDto employeeDto) {

@@ -58,6 +58,15 @@
             <scope>system</scope>
             <systemPath>${basedir}/library/swing-toast-notifications-1.0.4.jar</systemPath>
         </dependency>
-
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.18.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.dj-raven</groupId>
+            <artifactId>swing-datetime-picker</artifactId>
+            <version>2.0.0</version>
+        </dependency>
     </dependencies>
 </project>

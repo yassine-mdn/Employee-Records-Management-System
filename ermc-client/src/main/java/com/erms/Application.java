@@ -23,11 +23,11 @@ public class Application extends JFrame {
 
     public Application() {
         initComponents();
-        setSize(new Dimension(1200, 700));
+        setSize(new Dimension(1300, 800));
         setLocationRelativeTo(null);
         homePage = new Home();
         loginPage = new Login();
-        setContentPane(homePage);
+        setContentPane(loginPage);
         getRootPane().putClientProperty(FlatClientProperties.FULL_WINDOW_CONTENT, true);
         Notifications.getInstance().setJFrame(this);
     }

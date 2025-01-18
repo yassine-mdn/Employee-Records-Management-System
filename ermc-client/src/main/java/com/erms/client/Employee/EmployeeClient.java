@@ -29,7 +29,7 @@ public class EmployeeClient {
         objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
         token = AuthenticatedEmployee.getInstance().getAuthenticationResponse().getAccessToken();
         if (token == null) {
-            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT,"Seesion Expired Please Login Again");
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT,"Session Expired Please Login Again");
             Application.logout();
         }
     }
@@ -44,6 +44,10 @@ public class EmployeeClient {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
+        if (response.statusCode() == 401) {
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT,"Session Expired Please Login Again");
+            Application.logout();
+        }
         if (response.statusCode() == 201) {
             return objectMapper.readValue(response.body(), Employee.class);
         }

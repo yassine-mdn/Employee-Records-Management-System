@@ -4,12 +4,14 @@
  */
 package com.erms.pages.home;
 
+import com.erms.utils.ButtonColumn;
 import com.erms.utils.TableHeaderAlignment;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.awt.event.KeyEvent;
 
 /**
  *
@@ -67,6 +69,9 @@ public class EmployeeListPanel extends javax.swing.JPanel {
 
 
         table.getTableHeader().setDefaultRenderer(new TableHeaderAlignment(table));
+
+        ButtonColumn buttonColumn = new ButtonColumn(table, null, 9);
+        buttonColumn.setMnemonic(KeyEvent.VK_D);
     }
 
     /**
@@ -93,10 +98,10 @@ public class EmployeeListPanel extends javax.swing.JPanel {
 
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, new FlatSVGIcon("static/svg/edit.svg", 16, 16)},
+                {null, null, null, null, null, null, null, null, null, new FlatSVGIcon("static/svg/edit.svg", 16, 16)},
+                {null, null, null, null, null, null, null, null, null, new FlatSVGIcon("static/svg/edit.svg", 16, 16)},
+                {null, null, null, null, null, null, null, null, null, new FlatSVGIcon("static/svg/edit.svg", 16, 16)},
             },
             new String [] {
                 "Full name", "Email", "Job title", "Hire date", "Department", "Status", "Contact info", "address", "Role", ""
@@ -128,7 +133,7 @@ public class EmployeeListPanel extends javax.swing.JPanel {
             table.getColumnModel().getColumn(6).setPreferredWidth(80);
             table.getColumnModel().getColumn(7).setPreferredWidth(100);
             table.getColumnModel().getColumn(8).setPreferredWidth(50);
-            table.getColumnModel().getColumn(9).setResizable(false);
+            table.getColumnModel().getColumn(9).setPreferredWidth(16);
         }
 
         txtSearch.addActionListener(new java.awt.event.ActionListener() {

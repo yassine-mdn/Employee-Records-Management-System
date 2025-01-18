@@ -3,9 +3,9 @@ spring:
     name: ermc-back
 # This is only temporary -> will migrate to Oracle SQL later on
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USER}
-    password: ${DATABASE_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/ermc
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

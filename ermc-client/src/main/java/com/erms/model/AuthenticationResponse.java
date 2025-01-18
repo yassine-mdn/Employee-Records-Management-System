@@ -1,5 +1,6 @@
 package com.erms.model;
 
+import com.erms.model.enums.Role;
 import lombok.*;
 
 import java.util.Objects;
@@ -12,7 +13,7 @@ import java.util.Objects;
 public class AuthenticationResponse {
 
   private String id;
-  private String role;
+  private Role role;
   private String accessToken;
   private String refreshToken;
 

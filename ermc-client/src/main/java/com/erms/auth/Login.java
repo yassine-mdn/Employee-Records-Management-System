@@ -4,12 +4,16 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import com.erms.client.auth.AuthClient;
+import com.erms.context.AuthenticatedEmployee;
 import com.erms.context.CardPanelManager;
 import com.erms.manager.FormsManager;
+import com.erms.model.ApiError;
 import com.erms.model.AuthenticationRequest;
 import com.erms.model.AuthenticationResponse;
+import com.erms.model.enums.Role;
 import com.formdev.flatlaf.FlatClientProperties;
 import net.miginfocom.swing.MigLayout;
+import raven.toast.Notifications;
 
 import javax.swing.*;
 import java.awt.*;
@@ -84,9 +88,23 @@ public class Login extends JPanel {
             try {
                 var response = authClient.login(new AuthenticationRequest(username,new String(password)));
                 if (response instanceof AuthenticationResponse) {
-                    CardPanelManager.getInstance().showPanel("test");
+                    AuthenticatedEmployee.getInstance().setAuthenticationResponse((AuthenticationResponse) response);
+                    var role = AuthenticatedEmployee.getInstance().getAuthenticationResponse().getRole();
+                    Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.BOTTOM_LEFT,"Login successful");
+                    if (role.equals(Role.ADMIN)) {
+                        System.out.println("Admin logged in");
+                        CardPanelManager.getInstance().showPanel("test");
+                        getRootPane().putClientProperty("JRootPane.titleBarBackground", new Color(23,180,252));
+                        getRootPane().putClientProperty("JRootPane.titleBarForeground", Color.white);
+                        // TODO : navigate to admin panel
+                    } else if (role.equals(Role.HR)) {
+                        // TODO:
+                    } else {
+                        // dfghjk
+                    }
+
                 } else {
-                    //TODO: show a toast of error
+                    Notifications.getInstance().show(Notifications.Type.ERROR,Notifications.Location.BOTTOM_RIGHT,"Login unsuccessful");
                 }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);

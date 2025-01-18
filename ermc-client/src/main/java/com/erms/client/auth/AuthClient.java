@@ -38,7 +38,7 @@ public class AuthClient {
         if (response.statusCode() == 200) {
             return objectMapper.readValue(response.body(), AuthenticationResponse.class);
         }
-        return objectMapper.readValue(response.body(), ApiError.class);
+        return "Unauthorized";
     }
 
 

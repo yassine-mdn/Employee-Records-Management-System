@@ -5,6 +5,7 @@ import com.erms.context.CardPanelManager;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import raven.toast.Notifications;
 
 
 import javax.swing.*;
@@ -25,6 +26,7 @@ public class Application extends JFrame {
         cardPanel.add(new JPanel(), "test");
         add(cardPanel);
         cardPanelManager.showPanel("login-page");
+        Notifications.getInstance().setJFrame(this);
         setLocationRelativeTo(null);
     }
 

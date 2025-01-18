@@ -2,11 +2,9 @@ package com.erms.client.Employee;
 
 import com.erms.Application;
 import com.erms.context.AuthenticatedEmployee;
-import com.erms.model.ApiError;
-import com.erms.model.AuthenticationResponse;
-import com.erms.model.Employee;
-import com.erms.model.EmployeeDto;
+import com.erms.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import raven.toast.Notifications;
@@ -50,6 +48,27 @@ public class EmployeeClient {
         }
         if (response.statusCode() == 201) {
             return objectMapper.readValue(response.body(), Employee.class);
+        }
+        return objectMapper.readValue(response.body(), ApiError.class);
+    }
+
+    public Object getEmployees() throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL+"/api/v1/employees?page=0&size=10"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer "+token)
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 401) {
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT,"Session Expired Please Login Again");
+            Application.logout();
+        }
+        if (response.statusCode() == 200) {
+            return objectMapper.readValue(response.body(), new TypeReference<PageWrapper<Employee>>() {
+            });
         }
         return objectMapper.readValue(response.body(), ApiError.class);
     }

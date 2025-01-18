@@ -4,9 +4,15 @@ import com.erms.model.enums.Department;
 import com.erms.model.enums.EmploymentStatus;
 import com.erms.model.enums.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 import java.time.LocalDate;
 
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Employee {
 
     @JsonProperty("id")

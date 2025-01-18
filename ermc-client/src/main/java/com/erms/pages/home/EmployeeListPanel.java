@@ -4,6 +4,9 @@
  */
 package com.erms.pages.home;
 
+import com.erms.client.Employee.EmployeeClient;
+import com.erms.model.Employee;
+import com.erms.model.PageWrapper;
 import com.erms.utils.ButtonColumn;
 import com.erms.utils.TableHeaderAlignment;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -11,10 +14,11 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 /**
- *
  * @author yassi
  */
 public class EmployeeListPanel extends javax.swing.JPanel {
@@ -69,7 +73,7 @@ public class EmployeeListPanel extends javax.swing.JPanel {
 
 
         table.getTableHeader().setDefaultRenderer(new TableHeaderAlignment(table));
-
+        loadTableData();
         ButtonColumn buttonColumn = new ButtonColumn(table, null, 9);
         buttonColumn.setMnemonic(KeyEvent.VK_D);
     }
@@ -97,29 +101,24 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         scroll.setBorder(null);
 
         table.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null, null, null, new FlatSVGIcon("static/svg/edit.svg", 16, 16)},
-                {null, null, null, null, null, null, null, null, null, new FlatSVGIcon("static/svg/edit.svg", 16, 16)},
-                {null, null, null, null, null, null, null, null, null, new FlatSVGIcon("static/svg/edit.svg", 16, 16)},
-                {null, null, null, null, null, null, null, null, null, new FlatSVGIcon("static/svg/edit.svg", 16, 16)},
-            },
-            new String [] {
-                "Full name", "Email", "Job title", "Hire date", "Department", "Status", "Contact info", "address", "Role", ""
-            }
+                new Object[][]{},
+                new String[]{
+                        "Full name", "Email", "Job title", "Hire date", "Department", "Status", "Contact info", "address", "Role", ""
+                }
         ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
+            Class[] types = new Class[]{
+                    java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
             };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, true
+            boolean[] canEdit = new boolean[]{
+                    false, false, false, false, false, false, false, false, false, true
             };
 
             public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
+                return types[columnIndex];
             }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+                return canEdit[columnIndex];
             }
         });
         scroll.setViewportView(table);
@@ -147,32 +146,85 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         javax.swing.GroupLayout panelLayout = new javax.swing.GroupLayout(panel);
         panel.setLayout(panelLayout);
         panelLayout.setHorizontalGroup(
-            panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
-            .addComponent(jSeparator1)
-            .addGroup(panelLayout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lableTitle)
-                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 368, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
+                        .addComponent(jSeparator1)
+                        .addGroup(panelLayout.createSequentialGroup()
+                                .addGap(20, 20, 20)
+                                .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lableTitle)
+                                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 368, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelLayout.setVerticalGroup(
-            panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelLayout.createSequentialGroup()
-                .addGap(38, 38, 38)
-                .addComponent(lableTitle)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
-                .addContainerGap())
+                panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(panelLayout.createSequentialGroup()
+                                .addGap(38, 38, 38)
+                                .addComponent(lableTitle)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, 0)
+                                .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         add(panel);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void loadTableData() {
+        EmployeeClient employeeClient = new EmployeeClient();
+        try {
+            var response = employeeClient.getEmployees();
+            if (response instanceof PageWrapper<?>) {
+                DefaultTableModel model = (DefaultTableModel) table.getModel();
+                if (table.isEditing()) {
+                    table.getCellEditor().stopCellEditing();
+                }
+                model.setRowCount(0);
+                List<Employee> list = ((PageWrapper<Employee>) response).getPage();
+                for (Employee e : list) {
+                    model.addRow(convetToTableRow(e));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Object[] convetToTableRow(Employee employee) {
+        return new Object[]{
+                employee.getFullName(),
+                employee.getEmail(),
+                employee.getJobTitle(),
+                employee.getHireDate(),
+                employee.getDepartment(),
+                employee.getEmploymentStatus(),
+                employee.getContactInformation(),
+                employee.getAddress(),
+                employee.getRole(),
+                new FlatSVGIcon("static/svg/edit.svg", 16, 16)
+        };
+    }
+
+    private Object[][] convertTo2dArray(List<Employee> employees) {
+        Object[][] data = new Object[employees.size()][10];
+        for (int i = 0; i < employees.size(); i++) {
+            Employee employee = employees.get(i);
+            data[i][0] = employee.getId();
+            data[i][1] = employee.getFullName();
+            data[i][2] = employee.getJobTitle();
+            data[i][3] = employee.getHireDate();
+            data[i][4] = employee.getDepartment();
+            data[i][5] = employee.getEmploymentStatus();
+            data[i][6] = employee.getContactInformation();
+            data[i][7] = employee.getAddress();
+            data[i][8] = employee.getEmail();
+            data[i][9] = employee.getRole();
+        }
+        return data;
+    }
 
     private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
         // TODO add your handling code here:

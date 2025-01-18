@@ -1,6 +1,7 @@
 package com.erms.model;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.List;
@@ -11,10 +12,15 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PageWrapper<T> {
-  private int totalPages;
-  private long totalElements;
-  private boolean hasNext;
-  private boolean hasPrevious;
-  private List<T> page;
+    @JsonProperty("totalPages")
+    private int totalPages;
+    @JsonProperty("totalElements")
+    private long totalElements;
+    @JsonProperty("hasNext")
+    private boolean hasNext;
+    @JsonProperty("hasPrevious")
+    private boolean hasPrevious;
+    @JsonProperty("page")
+    private List<T> page;
 
 }

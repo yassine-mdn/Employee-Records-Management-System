@@ -66,7 +66,7 @@ public class Home extends JLayeredPane {
             if (index == 0) {
                 Application.showHomePage(new DefaultPanel());
             } else if (index == 1) {
-
+                Application.showHomePage(new EmployeeListPanel());
             } else if (index == 2) {
                 Application.logout();
             } else {

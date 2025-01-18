@@ -1,8 +1,9 @@
-package com.erms.auth;
+package com.erms.pages.auth;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import com.erms.Application;
 import com.erms.client.auth.AuthClient;
 import com.erms.context.AuthenticatedEmployee;
 import com.erms.context.CardPanelManager;
@@ -93,7 +94,6 @@ public class Login extends JPanel {
                     Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.BOTTOM_LEFT,"Login successful");
                     if (role.equals(Role.ADMIN)) {
                         System.out.println("Admin logged in");
-                        CardPanelManager.getInstance().showPanel("test");
                         getRootPane().putClientProperty("JRootPane.titleBarBackground", new Color(23,180,252));
                         getRootPane().putClientProperty("JRootPane.titleBarForeground", Color.white);
                         // TODO : navigate to admin panel
@@ -102,7 +102,7 @@ public class Login extends JPanel {
                     } else {
                         // dfghjk
                     }
-
+                    Application.login();
                 } else {
                     Notifications.getInstance().show(Notifications.Type.ERROR,Notifications.Location.BOTTOM_RIGHT,"Login unsuccessful");
                 }

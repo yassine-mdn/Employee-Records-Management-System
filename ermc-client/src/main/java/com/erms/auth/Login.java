@@ -3,7 +3,11 @@ package com.erms.auth;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import com.erms.client.auth.AuthClient;
+import com.erms.context.CardPanelManager;
 import com.erms.manager.FormsManager;
+import com.erms.model.AuthenticationRequest;
+import com.erms.model.AuthenticationResponse;
 import com.formdev.flatlaf.FlatClientProperties;
 import net.miginfocom.swing.MigLayout;
 
@@ -69,6 +73,25 @@ public class Login extends JPanel {
         panel.add(txtPassword);
         panel.add(cmdLogin, "gapy 10");
         add(panel);
+
+
+
+        cmdLogin.addActionListener(e -> {
+            String username = txtUsername.getText();
+            char[] password = txtPassword.getPassword();
+            AuthClient authClient = new AuthClient();
+            // Replace with actual login logic
+            try {
+                var response = authClient.login(new AuthenticationRequest(username,new String(password)));
+                if (response instanceof AuthenticationResponse) {
+                    CardPanelManager.getInstance().showPanel("test");
+                } else {
+                    //TODO: show a toast of error
+                }
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
 
@@ -76,4 +99,5 @@ public class Login extends JPanel {
     private JTextField txtUsername;
     private JPasswordField txtPassword;
     private JButton cmdLogin;
+
 }

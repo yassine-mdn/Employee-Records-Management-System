@@ -1,6 +1,7 @@
 package com.erms;
 
 import com.erms.auth.Login;
+import com.erms.context.CardPanelManager;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
@@ -18,7 +19,12 @@ public class Application extends JFrame {
         setTitle("FlatLaf Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(new Dimension(1200, 700));
-        setContentPane(new Login());
+        CardPanelManager cardPanelManager = CardPanelManager.getInstance();
+        JPanel cardPanel = cardPanelManager.getCardPanel();
+        cardPanel.add(new Login(), "login-page");
+        cardPanel.add(new JPanel(), "test");
+        add(cardPanel);
+        cardPanelManager.showPanel("login-page");
         setLocationRelativeTo(null);
     }
 

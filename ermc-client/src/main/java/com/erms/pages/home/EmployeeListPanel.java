@@ -19,11 +19,13 @@ import raven.popup.component.SimplePopupBorder;
 import raven.toast.Notifications;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
+
+import static java.awt.SystemColor.window;
 
 /**
  * @author yassi
@@ -82,11 +84,13 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         table.getTableHeader().setDefaultRenderer(new TableHeaderAlignment(table));
         loadTableData();
 
-        ButtonColumn buttonColumn = getButtonColumn();
-        buttonColumn.setMnemonic(KeyEvent.VK_D);
+        ButtonColumn editButton = getEditColumn();
+        editButton.setMnemonic(KeyEvent.VK_D);
+        ButtonColumn deleteButton = getDeleteColumn();
+        deleteButton.setMnemonic(KeyEvent.VK_D);
     }
 
-    private ButtonColumn getButtonColumn() {
+    private ButtonColumn getEditColumn() {
 
         Action edit = new AbstractAction()
         {
@@ -132,6 +136,46 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         return buttonColumn;
     }
 
+    private ButtonColumn getDeleteColumn() {
+
+        Action delete = new AbstractAction()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                int modelRow = Integer.valueOf( e.getActionCommand() );
+                String id = table.getModel().getValueAt(modelRow, 0).toString();
+                String fullName = table.getModel().getValueAt(modelRow, 1).toString();
+                Window window = SwingUtilities.windowForComponent(table);
+                int result = JOptionPane.showConfirmDialog(
+                        window,
+                        "Are you sure you want to " + fullName,
+                        "Delete Row Confirmation",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (result == JOptionPane.YES_OPTION)
+                {
+					System.out.println( "Deleting row: " + modelRow);
+                    EmployeeClient employeeClient = new EmployeeClient();
+                    try {
+                        var response = employeeClient.deleteEmployee(id);
+                        if (response instanceof String) {
+                            Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.BOTTOM_RIGHT, "Employee deleted successfully");
+                        } else {
+                            ApiError error = (ApiError) response;
+                            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT, error.getMessage());
+                        }
+                        loadTableData();
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        };
+
+        ButtonColumn buttonColumn = new ButtonColumn(table, delete, 11);
+        return buttonColumn;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -156,16 +200,20 @@ public class EmployeeListPanel extends javax.swing.JPanel {
 
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Id", "Full name", "Email", "Job title", "Hire date", "Department", "Status", "Contact info", "address", "Role", ""
+                "Id", "Full name", "Email", "Job title", "Hire date", "Department", "Status", "Contact info", "address", "Role", "", ""
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, true
+                false, false, false, false, false, false, false, false, false, false, true, true
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -178,7 +226,7 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         });
         scroll.setViewportView(table);
         if (table.getColumnModel().getColumnCount() > 0) {
-            table.getColumnModel().getColumn(0).setPreferredWidth(200);
+            table.getColumnModel().getColumn(0).setPreferredWidth(130);
             table.getColumnModel().getColumn(1).setPreferredWidth(100);
             table.getColumnModel().getColumn(2).setPreferredWidth(100);
             table.getColumnModel().getColumn(3).setPreferredWidth(100);
@@ -187,8 +235,11 @@ public class EmployeeListPanel extends javax.swing.JPanel {
             table.getColumnModel().getColumn(6).setPreferredWidth(50);
             table.getColumnModel().getColumn(7).setPreferredWidth(80);
             table.getColumnModel().getColumn(8).setPreferredWidth(100);
-            table.getColumnModel().getColumn(9).setPreferredWidth(100);
+            table.getColumnModel().getColumn(9).setPreferredWidth(50);
             table.getColumnModel().getColumn(10).setResizable(false);
+            table.getColumnModel().getColumn(10).setPreferredWidth(18);
+            table.getColumnModel().getColumn(11).setResizable(false);
+            table.getColumnModel().getColumn(11).setPreferredWidth(18);
         }
 
         txtSearch.addActionListener(new java.awt.event.ActionListener() {
@@ -261,7 +312,8 @@ public class EmployeeListPanel extends javax.swing.JPanel {
                 employee.getContactInformation(),
                 employee.getAddress(),
                 employee.getRole(),
-                new FlatSVGIcon("static/svg/edit.svg", 16, 16)
+                new FlatSVGIcon("static/svg/edit.svg", 16, 16),
+                new FlatSVGIcon("static/svg/delete.svg", 16, 16)
         };
     }
 

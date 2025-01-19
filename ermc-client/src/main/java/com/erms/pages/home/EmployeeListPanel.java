@@ -22,9 +22,11 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
+import static java.awt.SystemColor.text;
 import static java.awt.SystemColor.window;
 
 /**
@@ -112,6 +114,19 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         btnPrevPage.addActionListener(e -> {
             page--;
             loadTableData();
+        });
+
+        txtSearch.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    page = 0;
+                    loadFilteredTableData();
+                } else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE && txtSearch.getText().isEmpty()) {
+                    page = 0;
+                    loadTableData();
+                }
+            }
         });
     }
 
@@ -299,19 +314,19 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         panelLayout.setVerticalGroup(
             panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelLayout.createSequentialGroup()
-                .addGap(38, 38, 38)
+                .addGap(20, 20, 20)
                 .addComponent(lableTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE)
+                .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNextPage, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnPrevPage, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(71, 71, 71))
+                .addGap(10, 10, 10))
         );
 
         add(panel);
@@ -321,6 +336,27 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         EmployeeClient employeeClient = new EmployeeClient();
         try {
             var response = employeeClient.getEmployees(page);
+            if (response instanceof PageWrapper<?>) {
+                PageWrapper<Employee> page = (PageWrapper<Employee>) response;
+                DefaultTableModel model = (DefaultTableModel) table.getModel();
+                btnNextPage.setEnabled(page.isHasNext());
+                btnPrevPage.setEnabled(page.isHasPrevious());
+                model.setRowCount(0);
+                List<Employee> list = page.getPage();
+                for (Employee e : list) {
+                    model.addRow(convetToTableRow(e));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void loadFilteredTableData() {
+        EmployeeClient employeeClient = new EmployeeClient();
+        String keyword = txtSearch.getText();
+        try {
+            var response = employeeClient.searchEmployees(keyword,page);
             if (response instanceof PageWrapper<?>) {
                 PageWrapper<Employee> page = (PageWrapper<Employee>) response;
                 DefaultTableModel model = (DefaultTableModel) table.getModel();

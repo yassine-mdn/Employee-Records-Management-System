@@ -3,6 +3,9 @@ package com.erms.client.Employee;
 import com.erms.Application;
 import com.erms.context.AuthenticatedEmployee;
 import com.erms.model.*;
+import com.erms.model.enums.Department;
+import com.erms.model.enums.EmploymentStatus;
+import com.erms.utils.EnumUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,9 +14,12 @@ import raven.toast.Notifications;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 
 public class EmployeeClient {
 
@@ -55,6 +61,28 @@ public class EmployeeClient {
     public Object getEmployees(int pageNumber) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL+"/api/v1/employees?page="+pageNumber+"&size=10"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer "+token)
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 401) {
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT,"Session Expired Please Login Again");
+            Application.logout();
+        }
+        if (response.statusCode() == 200) {
+            return objectMapper.readValue(response.body(), new TypeReference<PageWrapper<Employee>>() {
+            });
+        }
+        return objectMapper.readValue(response.body(), ApiError.class);
+    }
+
+    public Object searchEmployees(String keyword, int pageNumber) throws IOException, InterruptedException {
+        String encodedFilter = URLEncoder.encode(filterFormater(keyword), StandardCharsets.UTF_8.toString());
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL+"/api/v1/employees?page="+pageNumber+"&size=10&filter="+encodedFilter))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer "+token)
                 .GET()
@@ -135,5 +163,13 @@ public class EmployeeClient {
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String filterFormater(String keyword) {
+        if (keyword.contains("query=")) {
+            return keyword.replace("query=", "");
+        } else if (EnumUtils.isEnumName(keyword, Department.class)) {
+            return String.format("department : '%s'",keyword);
+        } else return String.format("fullName ~~ '*%1$s*' or id ~~ '*%1$s*' or jobTitle ~~ '*%1$s*' or email ~~ '*%1$s*'",keyword);
     }
 }

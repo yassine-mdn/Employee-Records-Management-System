@@ -1,10 +1,9 @@
 package com.erms.pages.home;
 
+import com.erms.Application;
 import com.erms.client.Employee.EmployeeClient;
-import com.erms.model.ApiError;
-import com.erms.model.Employee;
-import com.erms.model.EmployeeDto;
-import com.erms.model.PageWrapper;
+import com.erms.context.AuthenticatedEmployee;
+import com.erms.model.*;
 import com.erms.model.enums.Department;
 import com.erms.model.enums.EmploymentStatus;
 import com.erms.model.enums.Role;
@@ -42,6 +41,12 @@ public class EditForm extends JPanel {
         JFormattedTextField editor = new JFormattedTextField();
         dpHireDate.setEditor(editor);
 
+        AuthenticationResponse authEmployee = AuthenticatedEmployee.getInstance().getAuthenticationResponse();
+        if (authEmployee == null) {
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT,"Session Expired Please Login Again");
+            Application.logout();
+        }
+
 
         JPanel panel = new JPanel(new MigLayout("fillx,wrap,insets 35 45 30 45", "fill,600:280"));
 
@@ -58,18 +63,22 @@ public class EditForm extends JPanel {
         panel.add(txtEmail);
         panel.add(new JLabel("Job title"), "gapy 8");
         panel.add(txtJobTitle);
-        panel.add(new JLabel("Department"), "gapy 8");
-        panel.add(cmbDepartment);
-        panel.add(new JLabel("Hire date"), "gapy 8");
-        panel.add(editor);
-        panel.add(new JLabel("Employment status"), "gapy 8");
-        panel.add(cmbEmploymentStatus);
+        if (!authEmployee.getRole().equals(Role.MANAGER)){
+            panel.add(new JLabel("Department"), "gapy 8");
+            panel.add(cmbDepartment);
+            panel.add(new JLabel("Hire date"), "gapy 8");
+            panel.add(editor);
+            panel.add(new JLabel("Employment status"), "gapy 8");
+            panel.add(cmbEmploymentStatus);
+        }
         panel.add(new JLabel("Contact info"), "gapy 8");
         panel.add(txtContactInfo);
         panel.add(new JLabel("Address"), "gapy 8");
         panel.add(txtAddress);
-        panel.add(new JLabel("Role"), "gapy 8");
-        panel.add(cmbRole);
+        if (authEmployee.getRole().equals(Role.ADMIN)) {
+            panel.add(new JLabel("Role"), "gapy 8");
+            panel.add(cmbRole);
+        }
         add(panel);
 
     }

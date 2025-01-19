@@ -37,9 +37,7 @@
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="txtSearch" min="-2" pref="368" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Component id="btnExport" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                          <EmptySpace min="20" pref="412" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -58,14 +56,11 @@
                   <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
                   <Component id="lableTitle" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="txtSearch" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnExport" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="txtSearch" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="jSeparator1" min="-2" pref="2" max="-2" attributes="0"/>
                   <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-                  <Component id="scroll" pref="475" max="32767" attributes="0"/>
+                  <Component id="scroll" pref="476" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="btnNextPage" alignment="3" min="-2" pref="24" max="-2" attributes="0"/>
@@ -193,11 +188,6 @@
         <Component class="javax.swing.JButton" name="btnNextPage">
         </Component>
         <Component class="javax.swing.JButton" name="btnPrevPage">
-        </Component>
-        <Component class="javax.swing.JButton" name="btnExport">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Download report"/>
-          </Properties>
         </Component>
       </SubComponents>
     </Container>

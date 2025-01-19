@@ -165,6 +165,30 @@ public class EmployeeClient {
         }
     }
 
+    public byte[] downloadReport() {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL+"/api/v1/employees/report"))
+                    .header("Content-Type", "application/pdf")
+                    .header("Authorization", "Bearer "+token)
+                    .GET()
+                    .build();
+
+            HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+
+            if (response.statusCode() == 401) {
+                Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT,"Session Expired Please Login Again");
+                Application.logout();
+            }
+            if (response.statusCode() == 200) {
+                return response.body();
+            }
+            return null;
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private String filterFormater(String keyword) {
         if (keyword.contains("query=")) {
             return keyword.replace("query=", "");

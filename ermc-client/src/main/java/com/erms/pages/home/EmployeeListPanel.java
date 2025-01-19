@@ -5,10 +5,8 @@
 package com.erms.pages.home;
 
 import com.erms.client.Employee.EmployeeClient;
-import com.erms.model.ApiError;
-import com.erms.model.Employee;
-import com.erms.model.EmployeeDto;
-import com.erms.model.PageWrapper;
+import com.erms.context.AuthenticatedEmployee;
+import com.erms.model.*;
 import com.erms.utils.ButtonColumn;
 import com.erms.utils.TableHeaderAlignment;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -24,6 +22,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static java.awt.SystemColor.text;
@@ -85,15 +88,17 @@ public class EmployeeListPanel extends javax.swing.JPanel {
                 "focusWidth:0;" +
                 "innerFocusWidth:0");
 
+        btnExport.putClientProperty(FlatClientProperties.STYLE, "" +
+                "background:@accentColor;" +
+                "foreground:@background;" +
+                "borderWidth:0;" +
+                "focusWidth:0;" +
+                "innerFocusWidth:0");
+
         txtSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Search...");
         txtSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON, new FlatSVGIcon("static/svg/search.svg", 16, 16));
         txtSearch.putClientProperty(FlatClientProperties.STYLE, ""
-                + "arc:15;"
-                + "borderWidth:0;"
-                + "focusWidth:0;"
-                + "innerFocusWidth:0;"
-                + "margin:5,20,5,20;"
-                + "background:$Panel.background");
+                + "margin:5,20,5,20;");
 
         btnPrevPage.setIcon(new FlatSVGIcon("static/svg/menu_left.svg"));
         btnNextPage.setIcon(new FlatSVGIcon("static/svg/menu_right.svg"));
@@ -125,6 +130,25 @@ public class EmployeeListPanel extends javax.swing.JPanel {
                 } else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE && txtSearch.getText().isEmpty()) {
                     page = 0;
                     loadTableData();
+                }
+            }
+        });
+
+        btnExport.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Specify a file to save");
+            String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
+            fileChooser.setSelectedFile(new File("report-"+localDateString+".pdf"));
+            int userSelection = fileChooser.showSaveDialog(this);
+
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                EmployeeClient employeeClient = new EmployeeClient();
+                byte[] res =employeeClient.downloadReport();
+                try {
+                    Files.write(fileToSave.toPath(), res);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
                 }
             }
         });
@@ -233,6 +257,7 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         lableTitle = new javax.swing.JLabel();
         btnNextPage = new javax.swing.JButton();
         btnPrevPage = new javax.swing.JButton();
+        btnExport = new javax.swing.JButton();
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
 
@@ -292,6 +317,8 @@ public class EmployeeListPanel extends javax.swing.JPanel {
 
         lableTitle.setText("Employee list");
 
+        btnExport.setText("Download report");
+
         javax.swing.GroupLayout panelLayout = new javax.swing.GroupLayout(panel);
         panel.setLayout(panelLayout);
         panelLayout.setHorizontalGroup(
@@ -301,9 +328,14 @@ public class EmployeeListPanel extends javax.swing.JPanel {
             .addGroup(panelLayout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lableTitle)
-                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 368, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(panelLayout.createSequentialGroup()
+                        .addComponent(lableTitle)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(panelLayout.createSequentialGroup()
+                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 368, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnExport)
+                        .addGap(20, 20, 20))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnPrevPage, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -317,11 +349,13 @@ public class EmployeeListPanel extends javax.swing.JPanel {
                 .addGap(20, 20, 20)
                 .addComponent(lableTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnExport))
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
+                .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 475, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNextPage, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -397,6 +431,7 @@ public class EmployeeListPanel extends javax.swing.JPanel {
 
     private int page;
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnExport;
     private javax.swing.JButton btnNextPage;
     private javax.swing.JButton btnPrevPage;
     private javax.swing.JSeparator jSeparator1;

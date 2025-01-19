@@ -52,9 +52,9 @@ public class EmployeeClient {
         return objectMapper.readValue(response.body(), ApiError.class);
     }
 
-    public Object getEmployees() throws IOException, InterruptedException {
+    public Object getEmployees(int pageNumber) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL+"/api/v1/employees?page=0&size=10"))
+                .uri(URI.create(BASE_URL+"/api/v1/employees?page="+pageNumber+"&size=10"))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer "+token)
                 .GET()

@@ -36,7 +36,7 @@ public class EmployeeListPanel extends javax.swing.JPanel {
      * Creates new form EmployeeListPanel
      */
     public EmployeeListPanel() {
-
+        this.page = 0;
         initComponents();
         init();
     }
@@ -70,6 +70,19 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         lableTitle.putClientProperty(FlatClientProperties.STYLE, ""
                 + "font:bold +5;");
 
+        btnPrevPage.putClientProperty(FlatClientProperties.STYLE, "" +
+                "background:@accentColor;" +
+                "foreground:@background;" +
+                "borderWidth:0;" +
+                "focusWidth:0;" +
+                "innerFocusWidth:0");
+        btnNextPage.putClientProperty(FlatClientProperties.STYLE, "" +
+                "background:@accentColor;" +
+                "foreground:@background;" +
+                "borderWidth:0;" +
+                "focusWidth:0;" +
+                "innerFocusWidth:0");
+
         txtSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Search...");
         txtSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON, new FlatSVGIcon("static/svg/search.svg", 16, 16));
         txtSearch.putClientProperty(FlatClientProperties.STYLE, ""
@@ -80,6 +93,8 @@ public class EmployeeListPanel extends javax.swing.JPanel {
                 + "margin:5,20,5,20;"
                 + "background:$Panel.background");
 
+        btnPrevPage.setIcon(new FlatSVGIcon("static/svg/menu_left.svg"));
+        btnNextPage.setIcon(new FlatSVGIcon("static/svg/menu_right.svg"));
 
         table.getTableHeader().setDefaultRenderer(new TableHeaderAlignment(table));
         loadTableData();
@@ -88,6 +103,16 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         editButton.setMnemonic(KeyEvent.VK_D);
         ButtonColumn deleteButton = getDeleteColumn();
         deleteButton.setMnemonic(KeyEvent.VK_D);
+
+        btnNextPage.addActionListener(e -> {
+            page++;
+            loadTableData();
+        });
+
+        btnPrevPage.addActionListener(e -> {
+            page--;
+            loadTableData();
+        });
     }
 
     private ButtonColumn getEditColumn() {
@@ -191,6 +216,8 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         jSeparator1 = new javax.swing.JSeparator();
         txtSearch = new javax.swing.JTextField();
         lableTitle = new javax.swing.JLabel();
+        btnNextPage = new javax.swing.JButton();
+        btnPrevPage = new javax.swing.JButton();
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
 
@@ -262,6 +289,12 @@ public class EmployeeListPanel extends javax.swing.JPanel {
                     .addComponent(lableTitle)
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 368, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnPrevPage, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(8, 8, 8)
+                .addComponent(btnNextPage, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20))
         );
         panelLayout.setVerticalGroup(
             panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -273,8 +306,12 @@ public class EmployeeListPanel extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnNextPage, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnPrevPage, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(71, 71, 71))
         );
 
         add(panel);
@@ -283,14 +320,14 @@ public class EmployeeListPanel extends javax.swing.JPanel {
     private void loadTableData() {
         EmployeeClient employeeClient = new EmployeeClient();
         try {
-            var response = employeeClient.getEmployees();
+            var response = employeeClient.getEmployees(page);
             if (response instanceof PageWrapper<?>) {
+                PageWrapper<Employee> page = (PageWrapper<Employee>) response;
                 DefaultTableModel model = (DefaultTableModel) table.getModel();
-                if (table.isEditing()) {
-                    table.getCellEditor().stopCellEditing();
-                }
+                btnNextPage.setEnabled(page.isHasNext());
+                btnPrevPage.setEnabled(page.isHasPrevious());
                 model.setRowCount(0);
-                List<Employee> list = ((PageWrapper<Employee>) response).getPage();
+                List<Employee> list = page.getPage();
                 for (Employee e : list) {
                     model.addRow(convetToTableRow(e));
                 }
@@ -322,8 +359,10 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtSearchActionPerformed
 
-
+    private int page;
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnNextPage;
+    private javax.swing.JButton btnPrevPage;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel lableTitle;
     private javax.swing.JPanel panel;

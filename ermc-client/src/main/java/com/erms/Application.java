@@ -9,6 +9,7 @@ import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.extras.FlatAnimatedLafChange;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import raven.popup.GlassPanePopup;
 import raven.toast.Notifications;
 
 
@@ -30,6 +31,7 @@ public class Application extends JFrame {
         setContentPane(loginPage);
         getRootPane().putClientProperty(FlatClientProperties.FULL_WINDOW_CONTENT, true);
         Notifications.getInstance().setJFrame(this);
+        GlassPanePopup.install(this);
     }
 
 

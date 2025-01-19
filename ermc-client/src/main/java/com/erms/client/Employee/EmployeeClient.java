@@ -72,4 +72,44 @@ public class EmployeeClient {
         }
         return objectMapper.readValue(response.body(), ApiError.class);
     }
+
+    public Object getEmployeeById(String id) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL+"/api/v1/employees/"+id))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer "+token)
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 401) {
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT,"Session Expired Please Login Again");
+            Application.logout();
+        }
+        if (response.statusCode() == 200) {
+            return objectMapper.readValue(response.body(), Employee.class);
+        }
+        return objectMapper.readValue(response.body(), ApiError.class);
+    }
+
+    public Object updateEmployee(String id, EmployeeDto requestBody) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL+"/api/v1/employees/"+id))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer "+token)
+                .PUT(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(requestBody)))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 401) {
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT,"Session Expired Please Login Again");
+            Application.logout();
+        }
+        if (response.statusCode() == 200) {
+            return objectMapper.readValue(response.body(), Employee.class);
+        }
+        return objectMapper.readValue(response.body(), ApiError.class);
+    }
 }

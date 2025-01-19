@@ -5,16 +5,23 @@
 package com.erms.pages.home;
 
 import com.erms.client.Employee.EmployeeClient;
+import com.erms.model.ApiError;
 import com.erms.model.Employee;
+import com.erms.model.EmployeeDto;
 import com.erms.model.PageWrapper;
 import com.erms.utils.ButtonColumn;
 import com.erms.utils.TableHeaderAlignment;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
+import raven.popup.DefaultOption;
+import raven.popup.GlassPanePopup;
+import raven.popup.component.SimplePopupBorder;
+import raven.toast.Notifications;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
@@ -74,8 +81,55 @@ public class EmployeeListPanel extends javax.swing.JPanel {
 
         table.getTableHeader().setDefaultRenderer(new TableHeaderAlignment(table));
         loadTableData();
-        ButtonColumn buttonColumn = new ButtonColumn(table, null, 9);
+
+        ButtonColumn buttonColumn = getButtonColumn();
         buttonColumn.setMnemonic(KeyEvent.VK_D);
+    }
+
+    private ButtonColumn getButtonColumn() {
+
+        Action edit = new AbstractAction()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                EditForm editForm = new EditForm();
+                int modelRow = Integer.valueOf( e.getActionCommand() );
+                String id = table.getModel().getValueAt(modelRow, 0).toString();
+                editForm.setEmployee(id);
+                DefaultOption option = new DefaultOption() {
+                    @Override
+                    public boolean closeWhenClickOutside() {
+                        return true;
+                    }
+                };
+                String actions[] = new String[]{"Cancel", "Save"};
+                GlassPanePopup.showPopup(new SimplePopupBorder(editForm, "Edit Employee", actions, (pc, i) -> {
+                    if (i == 1) {
+                        EmployeeClient employeeClient = new EmployeeClient();
+                        try {
+                            EmployeeDto requestBody = editForm.getEmployeeDto();
+                            var response = employeeClient.updateEmployee(id,requestBody);
+                            if (response instanceof Employee) {
+                                Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.BOTTOM_RIGHT, "Employee updated successfully");
+                            } else {
+                                ApiError error = (ApiError) response;
+                                Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT, error.getMessage());
+                            }
+                            loadTableData();
+                            pc.closePopup();
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    } else {
+                        pc.closePopup();
+                    }
+                }), option);
+
+            }
+        };
+
+        ButtonColumn buttonColumn = new ButtonColumn(table, edit, 10);
+        return buttonColumn;
     }
 
     /**
@@ -101,38 +155,40 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         scroll.setBorder(null);
 
         table.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{},
-                new String[]{
-                        "Full name", "Email", "Job title", "Hire date", "Department", "Status", "Contact info", "address", "Role", ""
-                }
+            new Object [][] {
+            },
+            new String [] {
+                "Id", "Full name", "Email", "Job title", "Hire date", "Department", "Status", "Contact info", "address", "Role", ""
+            }
         ) {
-            Class[] types = new Class[]{
-                    java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
             };
-            boolean[] canEdit = new boolean[]{
-                    false, false, false, false, false, false, false, false, false, true
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false, false, false, true
             };
 
             public Class getColumnClass(int columnIndex) {
-                return types[columnIndex];
+                return types [columnIndex];
             }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit[columnIndex];
+                return canEdit [columnIndex];
             }
         });
         scroll.setViewportView(table);
         if (table.getColumnModel().getColumnCount() > 0) {
-            table.getColumnModel().getColumn(0).setPreferredWidth(100);
+            table.getColumnModel().getColumn(0).setPreferredWidth(200);
             table.getColumnModel().getColumn(1).setPreferredWidth(100);
             table.getColumnModel().getColumn(2).setPreferredWidth(100);
-            table.getColumnModel().getColumn(3).setPreferredWidth(80);
-            table.getColumnModel().getColumn(4).setPreferredWidth(100);
-            table.getColumnModel().getColumn(5).setPreferredWidth(50);
-            table.getColumnModel().getColumn(6).setPreferredWidth(80);
-            table.getColumnModel().getColumn(7).setPreferredWidth(100);
-            table.getColumnModel().getColumn(8).setPreferredWidth(50);
-            table.getColumnModel().getColumn(9).setPreferredWidth(16);
+            table.getColumnModel().getColumn(3).setPreferredWidth(100);
+            table.getColumnModel().getColumn(4).setPreferredWidth(80);
+            table.getColumnModel().getColumn(5).setPreferredWidth(100);
+            table.getColumnModel().getColumn(6).setPreferredWidth(50);
+            table.getColumnModel().getColumn(7).setPreferredWidth(80);
+            table.getColumnModel().getColumn(8).setPreferredWidth(100);
+            table.getColumnModel().getColumn(9).setPreferredWidth(100);
+            table.getColumnModel().getColumn(10).setResizable(false);
         }
 
         txtSearch.addActionListener(new java.awt.event.ActionListener() {
@@ -146,28 +202,28 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         javax.swing.GroupLayout panelLayout = new javax.swing.GroupLayout(panel);
         panel.setLayout(panelLayout);
         panelLayout.setHorizontalGroup(
-                panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
-                        .addComponent(jSeparator1)
-                        .addGroup(panelLayout.createSequentialGroup()
-                                .addGap(20, 20, 20)
-                                .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(lableTitle)
-                                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 368, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
+            .addComponent(jSeparator1)
+            .addGroup(panelLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lableTitle)
+                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 368, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelLayout.setVerticalGroup(
-                panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(panelLayout.createSequentialGroup()
-                                .addGap(38, 38, 38)
-                                .addComponent(lableTitle)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, 0)
-                                .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
-                                .addContainerGap())
+            panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelLayout.createSequentialGroup()
+                .addGap(38, 38, 38)
+                .addComponent(lableTitle)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         add(panel);
@@ -195,6 +251,7 @@ public class EmployeeListPanel extends javax.swing.JPanel {
 
     private Object[] convetToTableRow(Employee employee) {
         return new Object[]{
+                employee.getId(),
                 employee.getFullName(),
                 employee.getEmail(),
                 employee.getJobTitle(),
@@ -208,23 +265,6 @@ public class EmployeeListPanel extends javax.swing.JPanel {
         };
     }
 
-    private Object[][] convertTo2dArray(List<Employee> employees) {
-        Object[][] data = new Object[employees.size()][10];
-        for (int i = 0; i < employees.size(); i++) {
-            Employee employee = employees.get(i);
-            data[i][0] = employee.getId();
-            data[i][1] = employee.getFullName();
-            data[i][2] = employee.getJobTitle();
-            data[i][3] = employee.getHireDate();
-            data[i][4] = employee.getDepartment();
-            data[i][5] = employee.getEmploymentStatus();
-            data[i][6] = employee.getContactInformation();
-            data[i][7] = employee.getAddress();
-            data[i][8] = employee.getEmail();
-            data[i][9] = employee.getRole();
-        }
-        return data;
-    }
 
     private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
         // TODO add your handling code here:

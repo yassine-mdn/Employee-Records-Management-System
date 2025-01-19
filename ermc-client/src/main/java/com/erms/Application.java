@@ -15,6 +15,7 @@ import raven.toast.Notifications;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Collections;
 
 public class Application extends JFrame {
 
@@ -26,6 +27,7 @@ public class Application extends JFrame {
         initComponents();
         setSize(new Dimension(1300, 800));
         setLocationRelativeTo(null);
+        setIconImage(new ImageIcon(getClass().getResource("/static/logo-alt.png")).getImage());
         homePage = new Home();
         loginPage = new Login();
         setContentPane(loginPage);
@@ -53,6 +55,8 @@ public class Application extends JFrame {
     public static void logout() {
         FlatAnimatedLafChange.showSnapshot();
         AuthenticatedEmployee.getInstance().setAuthenticationResponse(null);
+        FlatLaf.setGlobalExtraDefaults( Collections.singletonMap( "@accentColor", "#6dc2d7" ));
+        FlatMacDarkLaf.setup();
         app.setContentPane(app.loginPage);
         app.loginPage.applyComponentOrientation(app.getComponentOrientation());
         SwingUtilities.updateComponentTreeUI(app.loginPage);

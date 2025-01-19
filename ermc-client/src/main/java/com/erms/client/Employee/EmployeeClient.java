@@ -189,6 +189,25 @@ public class EmployeeClient {
         }
     }
 
+    public Object registerEmployee(RegisterRequest requestBody) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL+"/api/v1/auth/register"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(requestBody)))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                return objectMapper.readValue(response.body(), Employee.class);
+            }
+            return objectMapper.readValue(response.body(), ApiError.class);
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private String filterFormater(String keyword) {
         if (keyword.contains("query=")) {
             return keyword.replace("query=", "");

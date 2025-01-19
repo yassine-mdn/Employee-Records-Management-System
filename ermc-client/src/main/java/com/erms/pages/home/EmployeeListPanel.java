@@ -7,6 +7,7 @@ package com.erms.pages.home;
 import com.erms.client.Employee.EmployeeClient;
 import com.erms.context.AuthenticatedEmployee;
 import com.erms.model.*;
+import com.erms.model.enums.Role;
 import com.erms.utils.ButtonColumn;
 import com.erms.utils.TableHeaderAlignment;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -170,34 +171,88 @@ public class EmployeeListPanel extends javax.swing.JPanel {
                         return true;
                     }
                 };
-                String actions[] = new String[]{"Cancel", "Save"};
-                GlassPanePopup.showPopup(new SimplePopupBorder(editForm, "Edit Employee", actions, (pc, i) -> {
-                    if (i == 1) {
-                        EmployeeClient employeeClient = new EmployeeClient();
-                        try {
-                            EmployeeDto requestBody = editForm.getEmployeeDto();
-                            var response = employeeClient.updateEmployee(id,requestBody);
-                            if (response instanceof Employee) {
-                                Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.BOTTOM_RIGHT, "Employee updated successfully");
-                            } else {
-                                ApiError error = (ApiError) response;
-                                Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT, error.getMessage());
-                            }
-                            loadTableData();
-                            pc.closePopup();
-                        } catch (Exception ex) {
-                            throw new RuntimeException(ex);
-                        }
-                    } else {
-                        pc.closePopup();
-                    }
-                }), option);
+                if (AuthenticatedEmployee.getInstance().getAuthenticationResponse().getRole().equals(Role.ADMIN)){
+                    adminEditPopUp(editForm, id, option);
+                }
+                else {
+                    nonAdminEditPopUp(editForm, id, option);
+                }
+
 
             }
         };
 
         ButtonColumn buttonColumn = new ButtonColumn(table, edit, 10);
         return buttonColumn;
+    }
+
+    private void nonAdminEditPopUp(EditForm editForm, String id, DefaultOption option) {
+
+        String actions[] = new String[]{"Cancel", "Save"};
+        GlassPanePopup.showPopup(new SimplePopupBorder(editForm, "Edit Employee", actions, (pc, i) -> {
+            if (i == 1) {
+                EmployeeClient employeeClient = new EmployeeClient();
+                try {
+                    EmployeeDto requestBody = editForm.getEmployeeDto();
+                    var response = employeeClient.updateEmployee(id,requestBody);
+                    if (response instanceof Employee) {
+                        Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.BOTTOM_RIGHT, "Employee updated successfully");
+                    } else {
+                        ApiError error = (ApiError) response;
+                        Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT, error.getMessage());
+                    }
+                    loadTableData();
+                    pc.closePopup();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            } else {
+                pc.closePopup();
+            }
+        }), option);
+    }
+
+    private void adminEditPopUp(EditForm editForm, String id, DefaultOption option) {
+
+        String actions[] = new String[]{"Cancel","Edit password", "Save"};
+        GlassPanePopup.showPopup(new SimplePopupBorder(editForm, "Edit Employee", actions, (pc, i) -> {
+            EmployeeClient employeeClient = new EmployeeClient();
+            if(i == 1){
+                String password = JOptionPane.showInputDialog("Enter new password");
+                if (password == null || password.isEmpty()) {
+                    return;
+                }
+                try {
+                    var response = employeeClient.registerEmployee(new RegisterRequest(id,password));
+                    if (response instanceof Employee) {
+                        Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.BOTTOM_RIGHT, "Password updated successfully");
+                    } else {
+                        ApiError error = (ApiError) response;
+                        Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT, error.getMessage());
+                    }
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            }else if (i == 2) {
+                try {
+                    EmployeeDto requestBody = editForm.getEmployeeDto();
+                    var response = employeeClient.updateEmployee(id,requestBody);
+                    if (response instanceof Employee) {
+                        Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.BOTTOM_RIGHT, "Employee updated successfully");
+                    } else {
+                        ApiError error = (ApiError) response;
+                        Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.BOTTOM_RIGHT, error.getMessage());
+                    }
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+                loadTableData();
+                pc.closePopup();
+            } else{
+                pc.closePopup();
+            }
+
+        }), option);
     }
 
     private ButtonColumn getDeleteColumn() {

@@ -3,28 +3,46 @@ package com.erms.model;
 import com.erms.model.enums.Department;
 import com.erms.model.enums.EmploymentStatus;
 import com.erms.model.enums.Role;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 import java.time.LocalDate;
 
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Employee {
-  private String id;
 
-  private String fullName;
+    @JsonProperty("id")
+    private String id;
 
-  private String jobTitle;
+    @JsonProperty("fullName")
+    private String fullName;
 
-  private LocalDate hireDate;
+    @JsonProperty("jobTitle")
+    private String jobTitle;
 
-  private Department department;
+    @JsonProperty("hireDate")
+    private LocalDate hireDate;
 
-  private EmploymentStatus employmentStatus;
+    @JsonProperty("department")
+    private Department department;
 
-  private String contactInformation;
+    @JsonProperty("employmentStatus")
+    private EmploymentStatus employmentStatus;
 
-  private String address;
+    @JsonProperty("contactInformation")
+    private String contactInformation;
 
-  private String email;
+    @JsonProperty("address")
+    private String address;
 
-  private Role role;
+    @JsonProperty("email")
+    private String email;
+
+    @JsonProperty("role")
+    private Role role;
 
 }

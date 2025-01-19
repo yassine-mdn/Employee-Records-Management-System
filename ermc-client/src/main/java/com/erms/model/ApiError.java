@@ -12,6 +12,7 @@ package com.erms.model;/*
 
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -29,9 +30,10 @@ import java.io.IOException;
 public class ApiError {
 
   private String status;
-  private LocalDateTime timestamp;
+  private String timestamp;
   private String message;
   private String debugMessage;
+  @JsonProperty("subErrors")
   private List<Object> subErrors;
 
 }

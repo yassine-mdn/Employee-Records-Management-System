@@ -529,6 +529,14 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "get report",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			],
 			"description": "Admin has access to everything else, but is the only one who can register new users, change roles, and his account cant be delted by users with lower authorization"

@@ -1,8 +1,9 @@
-package com.erms.auth;
+package com.erms.pages.auth;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import com.erms.Application;
 import com.erms.client.auth.AuthClient;
 import com.erms.context.AuthenticatedEmployee;
 import com.erms.context.CardPanelManager;
@@ -12,6 +13,8 @@ import com.erms.model.AuthenticationRequest;
 import com.erms.model.AuthenticationResponse;
 import com.erms.model.enums.Role;
 import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import net.miginfocom.swing.MigLayout;
 import raven.toast.Notifications;
 
@@ -20,6 +23,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
 public class Login extends JPanel {
 
@@ -92,17 +96,22 @@ public class Login extends JPanel {
                     var role = AuthenticatedEmployee.getInstance().getAuthenticationResponse().getRole();
                     Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.BOTTOM_LEFT,"Login successful");
                     if (role.equals(Role.ADMIN)) {
-                        System.out.println("Admin logged in");
-                        CardPanelManager.getInstance().showPanel("test");
                         getRootPane().putClientProperty("JRootPane.titleBarBackground", new Color(23,180,252));
+                        FlatLaf.setGlobalExtraDefaults( Collections.singletonMap( "@accentColor", "#FC174C" ));
                         getRootPane().putClientProperty("JRootPane.titleBarForeground", Color.white);
-                        // TODO : navigate to admin panel
-                    } else if (role.equals(Role.HR)) {
-                        // TODO:
-                    } else {
-                        // dfghjk
-                    }
 
+                    } else if (role.equals(Role.HR)) {
+                        getRootPane().putClientProperty("JRootPane.titleBarBackground", new Color(23, 252, 126));
+                        FlatLaf.setGlobalExtraDefaults( Collections.singletonMap( "@accentColor", "#17FC7E" ));
+                        getRootPane().putClientProperty("JRootPane.titleBarForeground", Color.white);
+                    } else {
+                        getRootPane().putClientProperty("JRootPane.titleBarBackground", new Color(182, 95, 227));
+                        FlatLaf.setGlobalExtraDefaults( Collections.singletonMap( "@accentColor", "#B65FE3" ));
+                        getRootPane().putClientProperty("JRootPane.titleBarForeground", Color.white);
+                    }
+                    FlatMacDarkLaf.setup();
+                    cleanup();
+                    Application.login();
                 } else {
                     Notifications.getInstance().show(Notifications.Type.ERROR,Notifications.Location.BOTTOM_RIGHT,"Login unsuccessful");
                 }
@@ -110,6 +119,11 @@ public class Login extends JPanel {
                 throw new RuntimeException(ex);
             }
         });
+    }
+
+    private void cleanup() {
+        txtUsername.setText("");
+        txtPassword.setText("");
     }
 
 

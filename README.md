@@ -29,9 +29,9 @@ The Employee Records Management System (ERMS) is designed to centralize the mana
   - [X] Implement basic reporting features for employee data.
 
 **Frontend Development**
-  - [ ] Design and implement the Swing-based desktop UI.
-  - [ ] Use MigLayout and GridBagLayout for layout management.
-  - [ ] Create forms for employee CRUD operations.
+  - [X] Design and implement the Swing-based desktop UI.
+  - [X] Use MigLayout and GridBagLayout for layout management.
+  - [X] Create forms for employee CRUD operations.
 
  **Testing**
   - [X] Write unit tests for service and controller layers using JUnit and Mockito.
@@ -40,10 +40,6 @@ The Employee Records Management System (ERMS) is designed to centralize the mana
   
 
 **Dockerization**
-  - [ ] Create a Dockerfile for the application.
-  - [ ] Build and test the Docker image locally.
+  - [X] Create a Dockerfile for the application.
+  - [X] Build and test the Docker image locally.
 
-## Getting Started
-
-1. Clone the repository.
-2. WIP

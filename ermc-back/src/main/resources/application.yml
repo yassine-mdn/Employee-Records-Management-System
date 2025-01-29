@@ -6,7 +6,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/ermc
     username: postgres
     password: postgres
-    driver-class-name: org.postgresql.Driver
+    driver-class-name: oracle.jdbc.OracleDriver
   jpa:
     hibernate:
       ddl-auto: update
@@ -14,7 +14,7 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.OracleDialect
 logging:
   file:
     name: logs/app.logs
